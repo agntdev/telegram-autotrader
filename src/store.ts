@@ -258,4 +258,5 @@ export function _resetStore(): void {
   userAccountIndex.clear();
   userStrategyIndex.clear();
   idCounter = 0;
+  clockFn = () => Date.now();
 }
