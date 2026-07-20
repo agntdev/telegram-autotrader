@@ -23,7 +23,10 @@ describe("dialog specs (the publish gate replays these)", () => {
     const specs = files.flatMap((f) =>
       parseBotSpecs(JSON.parse(readFileSync(join(SPECS_DIR, f), "utf8"))),
     );
-    const suite = await runSpecs(() => { _resetStore(); return buildBot("123456:TEST"); }, specs);
+    const suite = await runSpecs(async () => {
+      _resetStore();
+      return buildBot("123456:TEST");
+    }, specs);
     expect(suite.failed, "\n" + formatSuiteResult(suite)).toBe(0);
   });
 });
