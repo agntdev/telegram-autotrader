@@ -1,19 +1,17 @@
 [
   {
-    "name": "/link",
+    "name": "/link shows the linking confirmation",
     "steps": [
       {
+        "send": { "text": "/link" },
         "expect": [
           {
             "method": "sendMessage",
             "payload": {
-              "text": "Initiate brokerage account linking flow"
+              "text": "🔗 Connect your brokerage account\n\nWe'll link your account for balance viewing and trade execution.\nYour credentials are encrypted and never stored in plain text."
             }
           }
-        ],
-        "send": {
-          "text": "/link"
-        }
+        ]
       }
     ]
   }

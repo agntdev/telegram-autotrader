@@ -1,15 +1,77 @@
 import { Composer } from "grammy";
+import type { Ctx } from "../bot.js";
+import { inlineButton, inlineKeyboard, confirmKeyboard } from "../toolkit/index.js";
+import {
+  getActiveAccount,
+  removeLinkedAccounts,
+  setStrategyActive,
+  audit,
+} from "../store.js";
 
-// SCAFFOLD — generated from the bot blueprint BEFORE the agent runs.
-// Keep a LIVE registration (.command / .callbackQuery / …) so this feature is
-// never an empty stub. Replace the reply body with real logic + copy; if you
-// change the user-facing text, update tests/specs to match EXACTLY.
-// Do NOT rewrite src/bot.ts — buildBot() already auto-loads this module.
+const composer = new Composer<Ctx>();
 
-const composer = new Composer();
+const backToMenu = inlineKeyboard([[inlineButton("⬅️ Back to menu", "menu:main")]]);
+
+const UNLINK_TEXT =
+  "🔌 Disconnect account?\n\n" +
+  "Trading will be paused and your account will be removed.\n" +
+  "You can reconnect at any time.";
+
+const DONE_TEXT =
+  "Account disconnected. Trading has been paused.\n\n" +
+  "Tap Connect to link a new account.";
+
+const NO_ACCOUNT_TEXT =
+  "No linked account to disconnect.";
 
 composer.command("unlink", async (ctx) => {
-  await ctx.reply("Disconnect brokerage account");
+  const userId = ctx.from?.id ?? 0;
+  const acct = getActiveAccount(userId);
+  if (!acct) {
+    await ctx.reply(NO_ACCOUNT_TEXT, { reply_markup: backToMenu });
+    return;
+  }
+  ctx.session.step = "unlink:confirm";
+  await ctx.reply(UNLINK_TEXT, {
+    reply_markup: confirmKeyboard("unlink"),
+  });
+});
+
+composer.callbackQuery("unlink:show", async (ctx) => {
+  await ctx.answerCallbackQuery();
+  const userId = ctx.from?.id ?? 0;
+  const acct = getActiveAccount(userId);
+  if (!acct) {
+    await ctx.editMessageText(NO_ACCOUNT_TEXT, { reply_markup: backToMenu });
+    return;
+  }
+  ctx.session.step = "unlink:confirm";
+  await ctx.editMessageText(UNLINK_TEXT, {
+    reply_markup: confirmKeyboard("unlink"),
+  });
+});
+
+composer.callbackQuery("unlink:yes", async (ctx) => {
+  await ctx.answerCallbackQuery();
+  if (ctx.session.step !== "unlink:confirm") return;
+  ctx.session.step = undefined;
+
+  const userId = ctx.from?.id ?? 0;
+  setStrategyActive(userId, false);
+  removeLinkedAccounts(userId);
+  ctx.session.linkedAccountId = undefined;
+  ctx.session.strategyActive = false;
+
+  audit("account_unlinked", userId);
+
+  await ctx.editMessageText(DONE_TEXT, { reply_markup: backToMenu });
+});
+
+composer.callbackQuery("unlink:no", async (ctx) => {
+  await ctx.answerCallbackQuery();
+  if (ctx.session.step !== "unlink:confirm") return;
+  ctx.session.step = undefined;
+  await ctx.editMessageText("Disconnect cancelled.", { reply_markup: backToMenu });
 });
 
 export default composer;

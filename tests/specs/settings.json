@@ -1,19 +1,17 @@
 [
   {
-    "name": "/settings",
+    "name": "/settings shows the strategy settings panel",
     "steps": [
       {
+        "send": { "text": "/settings" },
         "expect": [
           {
             "method": "sendMessage",
             "payload": {
-              "text": "Adjust risk parameters and drawdown thresholds"
+              "text": "⚙️ Strategy Settings\n\nRisk level: conservative\nMax position size: 2%\nDrawdown threshold: 10%\nAllowed symbols: AAPL, MSFT, GOOGL, AMZN, TSLA\n\nTap a setting below to adjust."
             }
           }
-        ],
-        "send": {
-          "text": "/settings"
-        }
+        ]
       }
     ]
   }

@@ -1,19 +1,17 @@
 [
   {
-    "name": "/performance",
+    "name": "/performance shows no trades yet for a new user",
     "steps": [
       {
+        "send": { "text": "/performance" },
         "expect": [
           {
             "method": "sendMessage",
             "payload": {
-              "text": "Display historical performance metrics"
+              "text": "📈 Performance\n\nNo linked account.\n\nConnect your brokerage to see performance metrics."
             }
           }
-        ],
-        "send": {
-          "text": "/performance"
-        }
+        ]
       }
     ]
   }

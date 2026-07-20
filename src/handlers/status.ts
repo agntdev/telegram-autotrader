@@ -1,15 +1,53 @@
 import { Composer } from "grammy";
+import type { Ctx } from "../bot.js";
+import { inlineButton, inlineKeyboard } from "../toolkit/index.js";
+import {
+  getActiveAccount,
+  getOrCreateStrategy,
+} from "../store.js";
 
-// SCAFFOLD — generated from the bot blueprint BEFORE the agent runs.
-// Keep a LIVE registration (.command / .callbackQuery / …) so this feature is
-// never an empty stub. Replace the reply body with real logic + copy; if you
-// change the user-facing text, update tests/specs to match EXACTLY.
-// Do NOT rewrite src/bot.ts — buildBot() already auto-loads this module.
+const composer = new Composer<Ctx>();
 
-const composer = new Composer();
+const backToMenu = inlineKeyboard([[inlineButton("⬅️ Back to menu", "menu:main")]]);
+
+function buildStatus(userId: number): string {
+  const acct = getActiveAccount(userId);
+  const strat = getOrCreateStrategy(userId);
+
+  if (!acct) {
+    return (
+      "📊 Account Status\n\n" +
+      "No linked account.\n\n" +
+      "Tap Connect to link your brokerage account."
+    );
+  }
+
+  const tradingLine = strat.active ? "Active" : "Inactive";
+  const stratLine = [
+    `Risk level: ${strat.params.riskLevel}`,
+    `Max position: ${strat.params.maxPositionSizePct}%`,
+    `Drawdown limit: ${strat.params.drawdownThresholdPct}%`,
+  ].join("\n");
+
+  return (
+    `📊 Account Status\n\n` +
+    `Exchange: ${acct.exchange}\n` +
+    `Account: ${acct.maskedAccountId}\n` +
+    `Status: ${acct.status}\n\n` +
+    `Trading: ${tradingLine}\n` +
+    stratLine
+  );
+}
 
 composer.command("status", async (ctx) => {
-  await ctx.reply("Show current open positions and strategy status");
+  const userId = ctx.from?.id ?? 0;
+  await ctx.reply(buildStatus(userId), { reply_markup: backToMenu });
+});
+
+composer.callbackQuery("status:show", async (ctx) => {
+  await ctx.answerCallbackQuery();
+  const userId = ctx.from?.id ?? 0;
+  await ctx.editMessageText(buildStatus(userId), { reply_markup: backToMenu });
 });
 
 export default composer;
