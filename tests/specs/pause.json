@@ -1,19 +1,33 @@
 [
   {
-    "name": "/pause",
+    "name": "/pause shows the pause confirmation when trading is active",
     "steps": [
       {
+        "send": { "text": "/start" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "callback": "link:show" },
+        "expect": [{ "method": "editMessageText" }]
+      },
+      {
+        "send": { "callback": "link:yes" },
+        "expect": [{ "method": "editMessageText" }]
+      },
+      {
+        "send": { "callback": "resume:show" },
+        "expect": [{ "method": "editMessageText" }]
+      },
+      {
+        "send": { "text": "/pause" },
         "expect": [
           {
             "method": "sendMessage",
             "payload": {
-              "text": "Immediately stop trading"
+              "text": "⏸ Pause trading?\n\nNo new orders will be placed while trading is paused.\nExisting positions will remain open."
             }
           }
-        ],
-        "send": {
-          "text": "/pause"
-        }
+        ]
       }
     ]
   }

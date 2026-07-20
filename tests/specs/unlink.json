@@ -1,19 +1,17 @@
 [
   {
-    "name": "/unlink",
+    "name": "/unlink shows no account to disconnect for a new user",
     "steps": [
       {
+        "send": { "text": "/unlink" },
         "expect": [
           {
             "method": "sendMessage",
             "payload": {
-              "text": "Disconnect brokerage account"
+              "text": "No linked account to disconnect."
             }
           }
-        ],
-        "send": {
-          "text": "/unlink"
-        }
+        ]
       }
     ]
   }

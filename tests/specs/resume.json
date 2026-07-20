@@ -1,19 +1,41 @@
 [
   {
-    "name": "/resume",
+    "name": "/resume resumes trading when paused",
     "steps": [
       {
+        "send": { "text": "/start" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "callback": "link:show" },
+        "expect": [{ "method": "editMessageText" }]
+      },
+      {
+        "send": { "callback": "link:yes" },
+        "expect": [{ "method": "editMessageText" }]
+      },
+      {
+        "send": { "callback": "resume:show" },
+        "expect": [{ "method": "editMessageText" }]
+      },
+      {
+        "send": { "callback": "pause:show" },
+        "expect": [{ "method": "editMessageText" }]
+      },
+      {
+        "send": { "callback": "pause:yes" },
+        "expect": [{ "method": "editMessageText" }]
+      },
+      {
+        "send": { "text": "/resume" },
         "expect": [
           {
             "method": "sendMessage",
             "payload": {
-              "text": "Restart trading after pause"
+              "text": "Trading resumed. Orders will be placed based on your strategy settings."
             }
           }
-        ],
-        "send": {
-          "text": "/resume"
-        }
+        ]
       }
     ]
   }

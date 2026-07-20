@@ -1,19 +1,17 @@
 [
   {
-    "name": "/status",
+    "name": "/status shows no linked account for a new user",
     "steps": [
       {
+        "send": { "text": "/status" },
         "expect": [
           {
             "method": "sendMessage",
             "payload": {
-              "text": "Show current open positions and strategy status"
+              "text": "📊 Account Status\n\nNo linked account.\n\nTap Connect to link your brokerage account."
             }
           }
-        ],
-        "send": {
-          "text": "/status"
-        }
+        ]
       }
     ]
   }
