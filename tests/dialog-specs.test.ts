@@ -2,7 +2,8 @@ import { describe, expect, it } from "vitest";
 import { existsSync, readdirSync, readFileSync } from "fs";
 import { join } from "path";
 import { buildBot } from "../src/bot";
-import { _resetStore } from "../src/store";
+import { _resetStore } from "../src/store.js";
+import { _resetMainMenu } from "../src/toolkit/ui/menu.js";
 import { formatSuiteResult, parseBotSpecs, runSpecs } from "../src/toolkit/harness/run-specs";
 
 // THE PUBLISH GATE replays every tests/specs/*.json against your built bot via the
@@ -23,7 +24,11 @@ describe("dialog specs (the publish gate replays these)", () => {
     const specs = files.flatMap((f) =>
       parseBotSpecs(JSON.parse(readFileSync(join(SPECS_DIR, f), "utf8"))),
     );
-    const suite = await runSpecs(async () => { _resetStore(); return buildBot("123456:TEST"); }, specs);
+    const suite = await runSpecs(async () => {
+      _resetStore();
+      _resetMainMenu();
+      return buildBot("123456:TEST");
+    }, specs);
     expect(suite.failed, "\n" + formatSuiteResult(suite)).toBe(0);
   });
 });
